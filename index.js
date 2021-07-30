@@ -51,18 +51,26 @@ function createPoke(e) {
       img: pokeImg,
       likes: 0,
     };
+    fetch('http://localhost:3000/pokemons')
     renderPoke(poke);
-    pokeForm.reset();
+    pokeForm.reset(); //clearing the form
   } else {
     alert("Fill in the form!!!");
   }
 }
 
-// function getPokemons() {
-// }
+function getPokemons() {
+  fetch('http://localhost:3000/pokemons')
+  .then(resp => resp.json())
+  .then(pokemons => {
+    // pokemons.forEach(pokemon => renderPoke(pokemon))
+    pokemons.forEach(renderPoke)
+  })
+}
 
 function init() {
+  getPokemons()
   pokeForm.addEventListener("submit", createPoke);
 }
 
-init();
+init()
