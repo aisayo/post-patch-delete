@@ -46,13 +46,23 @@ function createPoke(e) {
 
   if (pokeName !== "" && pokeImg !== "") {
     const poke = {
-      id: 7, // hard coded can be changed to  be more dynamic
       name: pokeName,
       img: pokeImg,
       likes: 0,
     };
-    fetch('http://localhost:3000/pokemons')
-    renderPoke(poke);
+
+    const configObj = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(poke),
+    }
+
+    fetch('http://localhost:3000/pokemons', configObj)
+    .then(resp => resp.json())
+    // .then(pokemon => renderPoke(pokemon))
+    .then(renderPoke)
     pokeForm.reset(); //clearing the form
   } else {
     alert("Fill in the form!!!");
