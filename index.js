@@ -23,19 +23,42 @@ function renderPoke(pokemon) {
   const likeBttn = document.createElement("button");
   likeBttn.className = "like-bttn";
   likeBttn.textContent = "♥";
-  likeBttn.addEventListener("click", increaseLike);
+  likeBttn.addEventListener("click", () => increaseLike(pokemon));
 
   const deleteBttn = document.createElement("button");
   deleteBttn.className = "delete-bttn";
   deleteBttn.textContent = "Delete";
+  deleteBttn.addEventListener("click", () => deletePokemon(pokemon.id));
 
   pokeCard.append(pokeImg, pokeName, pokeLikes, likesNum, likeBttn, deleteBttn);
   pokeContainer.appendChild(pokeCard);
 }
 
-function increaseLike(e) {
-  const likesElement = e.target.previousElementSibling;
-  likesElement.textContent = parseInt(likesElement.textContent) + 1;
+function deletePokemon(id) {
+  // make a fetch request delete
+  // pessimist or optimist :: pessimist
+  
+  fetch(`http://localhost:3000/pokemons/${id}`, { method: "DELETE" })
+  .then(resp => resp.json())
+  .then(() => document.getElementById(`poke-${pokemon.id}`).remove())
+}
+
+function increaseLike(pokemon) {
+  //console.log(pokemon)
+  // should we be pessimistic or optimistic when updating our html
+  // PATCH httb verb
+  // what is my endpoint going to be
+  const likesElement = event.target.previousElementSibling;
+  // const likes = pokemon.likes += 1
+  const likes = ++pokemon.likes;
+  // likesElement.textContent = likes; //updating the html to new likes
+  fetch(`http://localhost:3000/pokemons/${pokemon.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ likes: likes }),
+  })
+  .then(resp => resp.json())
+  .then(data => likesElement.textContent = data.likes)
 }
 
 function createPoke(e) {
@@ -52,17 +75,17 @@ function createPoke(e) {
     };
 
     const configObj = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(poke),
-    }
+    };
 
-    fetch('http://localhost:3000/pokemons', configObj)
-    .then(resp => resp.json())
-    // .then(pokemon => renderPoke(pokemon))
-    .then(renderPoke)
+    fetch("http://localhost:3000/pokemons", configObj)
+      .then((resp) => resp.json())
+      // .then(pokemon => renderPoke(pokemon))
+      .then(renderPoke);
     pokeForm.reset(); //clearing the form
   } else {
     alert("Fill in the form!!!");
@@ -70,17 +93,18 @@ function createPoke(e) {
 }
 
 function getPokemons() {
-  fetch('http://localhost:3000/pokemons')
-  .then(resp => resp.json())
-  .then(pokemons => {
-    // pokemons.forEach(pokemon => renderPoke(pokemon))
-    pokemons.forEach(renderPoke)
-  })
+  fetch("http://localhost:3000/pokemons")
+    .then((resp) => resp.json())
+    .then((pokemons) => {
+      // pokemons.forEach(pokemon => renderPoke(pokemon))
+      pokemons.forEach(renderPoke);
+    })
+    .catch(err => alert(err))
 }
 
 function init() {
-  getPokemons()
+  getPokemons();
   pokeForm.addEventListener("submit", createPoke);
 }
 
-init()
+init();
